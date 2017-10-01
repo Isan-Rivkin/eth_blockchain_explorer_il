@@ -1,0 +1,63 @@
+extend layout
+block content
+  style(type='text/css').
+    .panel-primary:hover {
+        box-shadow: 10px 10px 5px #888888;
+    }
+    .accountBox,table{
+      display:block;
+    }
+  script(type='text/javascript' src='/clientUtils.js')
+  script.
+    $(document).ready(function(){});
+  style.
+    #search{
+      display:block;
+      margin-bottom:20px;
+      margin-top:20px;
+    }
+  block content(dir ='rtl')
+    div.container
+      form(action="/node", method="post",dir="rtl",align="right")
+        div(class="row")
+          div(class="col-8")
+            input(type="text" id="search" class="form-control" ,name="blockchainquery",placeholder="Txhash/Address/מס חשבון/טרנזקציה" required)
+          div(class="col-4")
+            button.btn.btn-large.btn-primary(type="submit" class="btn btn-primary btn-block") חפש/י    
+  h1(id="message" dir="rtl") פרטי כתובת:
+  div(class='accountBox container' dir="rtl")
+    table(class="table table-responsive" dir="rtl")
+      thead(dir='rtl')
+        tr
+          th(dir='rtl') #{accountNum}
+          th
+      tbody
+        tr
+          td יתרה (אית'ר): #{balance}
+        tr
+          td יתרה (דולר ארה"ב בשער #{usdPrice}): #{balance_usd}
+        tr
+          td יתרה (ביטקוין בשער #{btcPrice}): #{balance_btc}
+        tr
+          td יתרה (שקלים בשער דולר #{ilsPrice}): #{balance_ils}
+
+  hr
+  h1(id="message" dir="rtl") פירוט טרנזקציות:
+  div(class ='panel-group w3-mobile')
+      -var i = 0
+      each item,index in results
+          - i = i+1
+          div(class ='panel panel-primary')
+            div(class ='panel-heading' dir='rtl')
+               p שולח : #{item.innerFrom} ===>  מקבל : #{item.innerTo} 
+            div(class='panel-body' dir='rtl')
+              button(type="button" class="btn btn-info" data-toggle="collapse" data-target="#hash#{i}") מס טרנזקציה
+              p(id ="hash#{i}" class="collapse") #{item.hash}
+              button(type="button" class="btn btn-info" data-toggle="collapse" data-target="#from#{i}") כתובת השולח
+              p(id ="from#{i}" class="collapse") #{item.from}
+              button(type="button" class="btn btn-info" data-toggle="collapse" data-target="#to#{i}") כתובת המקבל
+              p(id ="to#{i}" class="collapse") #{item.to}
+              p זמן: #{item.innerTime}
+              p סכום: #{item.value} אית'ר
+              p עמלה: #{item.fee} אית'ר
+              p קיימת שגיאה? : #{item.innerIsError}
