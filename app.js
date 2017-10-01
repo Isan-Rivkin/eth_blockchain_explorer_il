@@ -83,6 +83,7 @@ app.get('/', function (req, res) {
 app.get('/calculators', function (req, res) {
     res.render('calculators',{ title : 'Calculator',content: "Welcome ..." }); 
 });
+
 var handleQuery = function(req,res){
   user_query = req.body.blockchainquery;
   if(user_query.length == addressLength)
