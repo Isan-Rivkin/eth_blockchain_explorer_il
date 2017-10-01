@@ -10,10 +10,10 @@ block content
     }
   block content(dir ='rtl')
     div.container
-      form(action="/node", method="post",dir="rtl",align="right")
+      form(action="/explorer", method="get",dir="rtl",align="right")
         div(class="row")
           div(class="col-8")
-            input(type="text" id="search" class="form-control" ,name="blockchainquery",placeholder="Txhash/Address/מס חשבון/טרנזקציה" required)
+            input(type="text" id="search" class="form-control" ,name="q",placeholder="Txhash/Address/מס חשבון/טרנזקציה" required)
           div(class="col-4")
             button.btn.btn-large.btn-primary(type="submit" class="btn btn-primary btn-block") חפש/י  
   hr

@@ -67,25 +67,37 @@ app.set('view engine', 'jade');
 app.use(logger('dev')); //replaces your app.use(express.logger());
 
 
+app.use(express.static('/var/www/ETHBlockchainExplorer/views'))
+app.use(express.static('public'))
+app.use(express.static('views'))
 app.use(express.static(path.join(__dirname, 'views')));
 //app.use('/static', express.static(path.join(__dirname, 'public')));
 
-app.get('/', function (req, res) {
-  analytics_counter +=1;
-  fs.writeFile("/var/www/ETHBlockchainExplorer/analytics", analytics_counter+'\n', function(err) {
+
+app.get('/calculators', function (req, res) {
+    user_query = req.query.blockchainquery;
+    console.log("@@@@@@@@@@@@@@@@@@@@@@@");
+    console.log("@@@@:" + user_query);
+    if(Object.keys(req.query).length === 0)
+      console.log("THE QUERT IS UNDEFINED !!!!! ");
+    res.render('calculators',{ title : 'Calculator',content: "Welcome ..." }); 
+});
+
+
+var handleQuery = function(req,res){
+  //user_query = req.body.blockchainquery;
+  if((Object.keys(req.query).length === 0))
+  {
+     analytics_counter +=1;
+    fs.writeFile("/var/www/ETHBlockchainExplorer/analytics", analytics_counter+'\n', function(err) {
     if(err) {
         return console.log(err);
     }
     console.log(" + 1 user : counter = " + analytics_counter);
-}); 
-    res.render('index',{ title : 'ETH',content: "Welcome ..." }); 
-});
-app.get('/calculators', function (req, res) {
-    res.render('calculators',{ title : 'Calculator',content: "Welcome ..." }); 
-});
-
-var handleQuery = function(req,res){
-  user_query = req.body.blockchainquery;
+    }); 
+    res.render('index',{ title : 'ETH',content: "Welcome ..." });
+  }
+  user_query = req.query.q;
   if(user_query.length == addressLength)
   {
     // get list of transactions 
@@ -178,5 +190,6 @@ var handleQuery = function(req,res){
     res.render('index',{ title : 'ETH',error: "קלט לא תקין" }); 
   }
 };
+app.get('/',handleQuery);
 app.post('/',handleQuery);
 app.listen(7000);
