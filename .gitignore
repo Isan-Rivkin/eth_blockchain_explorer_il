@@ -1,3 +1,8 @@
+
+#files
+app.js
+query_analytics
+
 # Logs
 logs
 *.log
