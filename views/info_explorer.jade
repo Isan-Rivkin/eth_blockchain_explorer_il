@@ -1,0 +1,63 @@
+extend layout
+block content
+  link(rel='stylesheet', href='/explorer_libs/stylesheets/index.css')
+  link(rel='stylesheet', href='/explorer_libs/stylesheets/info_explorer.css')
+  script(src='/explorer_libs/scripts/info_explorer.js')
+  style.
+    p{
+      font-weight: normal;
+    }
+    a{
+    text-decoration: underline;
+    }
+  block content(dir ='rtl')
+    div.container(dir='rtl')
+      hr
+      label כלי חינמי אשר מאפשר לחקור טרנזקציות וחשבונות ברשת האיתריום. 
+      br
+      label פותח ב &nbsp
+      img(src="http://www.freeiconspng.com/uploads/heart-png-15.png",width="30px")
+      label  &nbsp ע"י איתריום ישראל.
+      ul
+        li חיפוש לפי כתובת ארנק (Address, Public Key)
+        li חיפוש לפי מספר טרנזקציה (txHash)
+        li הכלי תחת פיתוח מתמיד וצפויים עוד המון עדכונים נוספים.
+      hr
+    div(dir='rtl').container
+      section
+        input#q1.animate(type='radio', name='question')
+        label.animate(for='q1') מה המטרה של ה- Ethereum Explorer?
+        p.response.animate 
+          | מכיוון שכל המידע של רשת הבלוקצ'ין פומבי וחשוף כל אחד יכול לגשת למידע זה.
+          br
+          | המטרה היא שתוכלו לעקוב אחר טרנזקציות של חשבונות ולצפות בפרטים של כל חשבון שתרצו.
+          br
+          | לדוגמא, תוכלו לבדוק את יתרת החשבון שלכם באיתריום, בדולרים ואף בשקלים.
+          br
+          | ואולי, אמור להגיע אליכם איתריום ? הזינו את המס המזהה של העסקה וראו את פרטיה.
+          br
+          | הרשת עשירה במידע, בשלב זה אנו מספקים פרטים בסיסיים ובקרוב תוכלו לראות מידע נוסף.
+        input#q2.animate(type='radio', name='question')
+        label.animate(for='q2') כיצד ניתן לראות פרטים על חשבון?
+        p.response.animate
+          | הדרך לגשת לכל חשבון ברשת היא ע"י המפתח הפומבי (Public Key). 
+          br
+          | לדוגמא: &nbsp
+          a(href="http://ethereumisrael.org/explorer?q=0x75f75A59AEAF0BabA0E80c94C59B4A0Aa5e3568c" id="example") 0x75f75A59AEAF0BabA0E80c94C59B4A0Aa5e3568c
+        input#q3.animate(type='radio', name='question')
+        label.animate(for='q3') כיצד ניתן לראות פרטים על טרנזקציה?
+        p.response.animate
+          | הדרך לגשת למידע של טרנזקציה ברשת היא ע"י המספר המזהה שלה (txHash). 
+          br
+          | לדוגמא: &nbsp
+          a(href="http://ethereumisrael.org/explorer?q=0x6185f7dc7310a2f6f1505919899441bba0d051bc522ec0d6fd3763014dae5837" id="example") 0x6185f7dc7310a2f6f1505919899441bba0d051bc522ec0d6fd3763014dae5837
+        input#q4.animate(type='radio', name='question')
+        label.animate(for='q4') האם זה בטוח?
+        p.response.animate
+          | כן, ב-100%.
+          br
+          | המידע היחיד שאתם נדרשים להזין הוא מספר החשבון ו/או מספר מזהה של טרנזקציה.
+          br 
+          | אלו נתונים שחופשיים לציבור.
+          br
+          | בנוסף לכך, אנו לא שומרים מידע אצלינו כלל ובשום תנאי אל תזינו את המפתח הפרטי שלכם אלא אם כן זהו ארנקכם.

@@ -1,0 +1,41 @@
+doctype
+html
+  head
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    title #{title} - איתר אקספלורר
+    link(rel='stylesheet', href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css')
+    link(red='stylesheet', href='https://www.w3schools.com/w3css/4/w3.css')
+    script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
+    script(src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js")
+  body
+    style.
+      .cascade{
+        background-color:#428bca;
+      }
+      .aNav{
+        color:white;
+      }
+    nav(class="navbar navbar-inverse")
+      div(class="container-fluid cascade")
+        div(class="navbar-header")
+          button(type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar")
+            span(class="icon-bar cascade")
+            span(class="icon-bar")
+            span(class="icon-bar")
+        div(class="collapse navbar-collapse" id="myNavbar")
+          ul(class="nav navbar-nav navbar-right aNav")
+            li.aNav: #[a(class="navbar-brand aNav" href="http://ethereumisrael.org/contact-us/") צור קשר]
+            li.aNav: #[a(class="navbar-brand aNav" href="http://ethereumisrael.org/explorer") חיפוש]
+            li.aNav: #[a(class="navbar-brand aNav" href="http://ethereumisrael.org/") לאתר הבית]
+            <!-- add calculators -->
+    header
+    .container
+      h3(dir="rtl") "מנוע החיפוש" של הבלוקצ'יין
+      .main-content
+        block content
+      .sidebar
+        block sidebar
+      hr
+      a(href="http://ethereumisrael.org/") All rights reserved ethereumisrael.org &copy
+    footer
+      p(dir='rtl') 

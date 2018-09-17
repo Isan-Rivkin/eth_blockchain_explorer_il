@@ -7,14 +7,17 @@ block content
     .accountBox,table{
       display:block;
     }
-  script(type='text/javascript' src='/clientUtils.js')
-  script.
-    $(document).ready(function(){});
   style.
     #search{
       display:block;
       margin-bottom:20px;
       margin-top:20px;
+    }
+    p{
+      font-weight: bold;
+    }
+    span{
+      font-weight: normal;
     }
   block content(dir ='rtl')
     div.container
@@ -33,13 +36,21 @@ block content
           th
       tbody
         tr
-          td יתרה (אית'ר): #{balance}
+          td 
+            p יתרה (אית'ר): 
+            span #{balance}
         tr
-          td יתרה (דולר ארה"ב בשער #{usdPrice}): #{balance_usd}
+          td 
+            p יתרה (דולר ארה"ב בשער #{usdPrice}): 
+            span $#{balance_usd}
         tr
-          td יתרה (ביטקוין בשער #{btcPrice}): #{balance_btc}
+          td 
+            p יתרה (ביטקוין בשער #{btcPrice}): 
+            span #{balance_btc} BTC
         tr
-          td יתרה (שקלים בשער דולר #{ilsPrice}): #{balance_ils}
+          td 
+            p יתרה (שקלים בשער דולר #{ilsPrice}): 
+            span #{balance_ils} &#8362
 
   hr
   h1(id="message" dir="rtl") פירוט טרנזקציות:
@@ -51,13 +62,19 @@ block content
             div(class ='panel-heading' dir='rtl')
                p שולח : #{item.innerFrom} ===>  מקבל : #{item.innerTo} 
             div(class='panel-body' dir='rtl')
-              button(type="button" class="btn btn-info" data-toggle="collapse" data-target="#hash#{i}") מס טרנזקציה
-              p(id ="hash#{i}" class="collapse") #{item.hash}
-              button(type="button" class="btn btn-info" data-toggle="collapse" data-target="#from#{i}") כתובת השולח
-              p(id ="from#{i}" class="collapse") #{item.from}
-              button(type="button" class="btn btn-info" data-toggle="collapse" data-target="#to#{i}") כתובת המקבל
-              p(id ="to#{i}" class="collapse") #{item.to}
-              p זמן: #{item.innerTime}
-              p סכום: #{item.value} אית'ר
-              p עמלה: #{item.fee} אית'ר
-              p קיימת שגיאה? : #{item.innerIsError}
+              button(type="button" class="btn btn-info" style="margin-left:5px;" data-toggle="collapse" data-target="#hash#{i}") מס טרנזקציה
+              a(id ="hash#{i}" href ="#{redirectSearchUrl}#{item.hash}" class="collapse") #{item.hash}
+              button(type="button" class="btn btn-info" style="margin-left:5px;" data-toggle="collapse" data-target="#from#{i}") כתובת השולח
+              a(id ="from#{i}" href ="#{redirectSearchUrl}#{item.from}" class="collapse") #{item.from}
+              button(type="button" class="btn btn-info" style="margin-left:5px;" data-toggle="collapse" data-target="#to#{i}") כתובת המקבל
+              a(id ="to#{i}" href ="#{redirectSearchUrl}#{item.to}" class="collapse") #{item.to}
+              p 
+                span    
+              p זמן: 
+                span #{item.innerTime}
+              p סכום: 
+                span #{item.value} אית'ר
+              p עמלה: 
+                span #{item.fee} אית'ר
+              p קיימת שגיאה? : 
+                span #{item.innerIsError}

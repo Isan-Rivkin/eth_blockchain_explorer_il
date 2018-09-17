@@ -10,7 +10,8 @@ block content
       color:red;
       display:block;
     }
-
+  script(src='/explorer_libs/scripts/index.js')
+  link(rel='stylesheet', href='/explorer_libs/stylesheets/index.css')
   block content(dir ='rtl')
     div.container(dir='rtl')
       hr
@@ -30,10 +31,64 @@ block content
           div(class="col-8")
             input(type="text" id="search" class="form-control" ,name="q",placeholder="Txhash/Address/מס חשבון/טרנזקציה" required)
           p(id="errormsg" dir='rtl') #{error}
+          //div(class="col-4")
+            //div(class="g-recaptcha" data-sitekey="6LcQdTMUAAAAAH_EdGOdn-FJTM_UPm2tSdDdD8kB" required)
           div(class="col-4")
             button.btn.btn-large.btn-primary(type="submit" class="btn btn-primary btn-block") חפש/י
-// block sidebar
-//   .widget
-//     h1 Widget
-//     p
-//       | SIDE WIDGET
+  
+    hr
+    div(id="tab_wrapper",class="container-fluid", dir='rtl')
+      div.row
+        div.panel.panel-info
+          div.panel-heading
+            p שער האיתריום |  
+              span(id="sync_date" dir='ltr')
+          div.panel-body
+            p שער אית'ר / דולר: &nbsp
+              p $
+                span(id="price_usd")
+            p שער אית'ר / שקל (ביחס לדולר #{data.rates.ILS}): &nbsp 
+              p &#8362
+                span(id="price_ils") 
+            p שער ביטקוין / אית'ר: &nbsp
+              p BTC 
+                span(id="price_btc")
+              p נפח מסחר ביממה האחרונה (דולר)
+                p $
+                  span(id="24h_volume_usd")
+              p שינוי יחסי בשעה האחרונה:
+                p %
+                  span(id="percent_change_1h")
+              p שינוי יחסי ביממה האחרונה:
+                p %
+                  span(id="percent_change_24h")
+              p שינוי יחסי בשבוע האחרון:
+                p %
+                  span(id="percent_change_7d")    
+              p סה"כ גודל השוק:
+                p $
+                  span(id="market_cap_usd")                              
+          div.panel-footer
+            a(href="https://coinmarketcap.com/") שערים יציגים לפי coinmarketcap.com
+  hr
+  div.container
+    h1(dir='rtl') הבלוק הכי עדכני ברשת - #{blockNumber}
+  br
+  div(class='panel-group w3-mobile')
+      div(class ='panel panel-info',dir='rtl')
+        p צפו בפרטי הטרנזקציות הכי עדכניות ברשת בבלוק מספר: #{blockNumber}
+        p מספר הטרנזקציות בבלוק: #{numOfTransactions}
+        p תאריך: #{timeStamp}
+    - var i = 0
+    each tx in tx_data
+      -i = i+1
+      div(class ='panel panel-info')
+        div(class ='panel-heading' dir='rtl')
+          label סכום:  #{tx.innerValue} אית'ר 
+        div(class='panel-body' dir='rtl')
+          button(type="button" class="btn btn-info" style="margin-left:5px;margin-right:5px;" data-toggle="collapse" data-target="#hash#{i}") מספר טרנזקציה
+          a(id ="hash#{i}" href ="#{redirectSearchUrl}#{tx.hash}" class="collapse") #{tx.hash}      
+          button(type="button" class="btn btn-info" style="margin-left:5px;" data-toggle="collapse" data-target="#from#{i}") שולח
+          a(id ="from#{i}" href ="#{redirectSearchUrl}#{tx.from}" class="collapse") #{tx.from}
+          button(type="button" class="btn btn-info" style="margin-left:5px;" data-toggle="collapse" data-target="#to#{i}") המקבל
+          a(id ="to#{i}" href ="#{redirectSearchUrl}#{tx.to}" class="collapse") #{tx.to}

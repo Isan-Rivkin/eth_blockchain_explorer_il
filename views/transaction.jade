@@ -1,12 +1,16 @@
 extend layout
 block content
-  script.
-    $(document).ready(function(){});
   style.
     #search{
       display:block;
       margin-bottom:20px;
       margin-top:20px;
+    }
+    p{
+      font-weight: bold;
+    }
+    span{
+      font-weight: normal;
     }
   block content(dir ='rtl')
     div.container
@@ -24,20 +28,31 @@ block content
           p סטטוס: #{result.txStatus}  | תאריך הבלוק: #{result.innerTimeStamp}
       div(class='panel-body' dir='rtl')
         button(type="button" class="btn btn-info" data-toggle="collapse" data-target="#hash") מס טרנזקציה
-        p(id ="hash" class="collapse") #{result.hash}
+        a(id ="hash" href ="#{redirectSearchUrl}#{result.hash}" class="collapse") #{result.hash}
         button(type="button" class="btn btn-info" data-toggle="collapse" data-target="#from") כתובת השולח
-        p(id ="from" class="collapse") #{result.from}
+        a(id ="from" href ="#{redirectSearchUrl}#{result.from}" class="collapse") #{result.from}
         button(type="button" class="btn btn-info" data-toggle="collapse" data-target="#to") כתובת המקבל
-        p(id ="to" class="collapse") #{result.to}
-        p זמן: #{result.innerTimeStamp}
-        p סכום: #{result.innerValue} אית'ר
-        p עמלה: #{result.innerFee} אית'ר
-        p מכסת גז : #{result.gasLimit}
-        p גז שהושקע : #{result.gasUsed}
-        p מחיר הגז : #{result.gasPrice} אית'ר
-        p מס הבלוק: #{result.blockNumber}
-        p מס הטרנזקציות של השולח: #{result.innerNonce}
-        p קיימת שגיאה ? : #{result.isError}
-        p סטטוס טרנזקציה : #{result.txStatus}
+        a(id ="to" href ="#{redirectSearchUrl}#{result.to}" class="collapse") #{result.to}
+        br
+        p זמן: 
+          span #{result.innerTimeStamp}
+        p סכום: 
+          span #{result.innerValue} אית'ר
+        p עמלה: 
+          span #{result.innerFee} אית'ר
+        p מכסת גז : 
+          span #{result.gasLimit}
+        p גז שהושקע : 
+          span #{result.gasUsed}
+        p מחיר הגז : 
+          span #{result.gasPrice} אית'ר
+        p מס הבלוק: 
+          span #{result.blockNumber}
+        p מס הטרנזקציות של השולח: 
+          span #{result.innerNonce}
+        p קיימת שגיאה ? : 
+          span #{result.isError}
+        p סטטוס טרנזקציה : 
+          span #{result.txStatus}
         button(type="button" class="btn btn-info" data-toggle="collapse" data-target="#data") מידע מצורף
         p(id ="data" class="collapse") #{result.input}

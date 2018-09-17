@@ -2,20 +2,33 @@ doctype
 html
   head
     meta(name="viewport" content="width=device-width, initial-scale=1")
-    title #{title} - איתר אקספלורר
+    title #{title} - ETH Explorer IL
     link(rel='stylesheet', href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css')
-    link(rel='stylesheet', href='/stylesheets/explorer_style.css')
     link(red='stylesheet', href='https://www.w3schools.com/w3css/4/w3.css')
     script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
     script(src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js")
+    link(rel='stylesheet', href='/explorer_libs/stylesheets/explorer.css')
+    script.
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-104943300-1', 'auto');
+      ga('send', 'pageview');
+  style.
+    .nav.navbar-nav.navbar-right li a {
+    color: white;
+    }
+    #main_icon{
+      width:50px;
+      margin:1em;
+    }
+    #ethil_icon{
+      width:150px;
+      height:40px;
+      margin:1em;
+    }
   body
-    style.
-      .cascade{
-        background-color:#428bca;
-      }
-      .aNav{
-        color:white;
-      }
     nav(class="navbar navbar-inverse")
       div(class="container-fluid cascade")
         div(class="navbar-header")
@@ -23,15 +36,23 @@ html
             span(class="icon-bar cascade")
             span(class="icon-bar")
             span(class="icon-bar")
+          a(href='http://ethereumisrael.org')
+            img(id="ethil_icon",src='http://ethereumisrael.org/wp-content/uploads/2017/10/tempILIcon.png')              
+          a(href='http://ethereumisrael.org/explorer')
+            img(id="main_icon",src='http://ethereumisrael.org/wp-content/uploads/2017/10/whiteIconExplorer.png')          
         div(class="collapse navbar-collapse" id="myNavbar")
           ul(class="nav navbar-nav navbar-right aNav")
+            li.aNav: #[a(class="navbar-brand aNav" href="http://ethereumisrael.org/register/")  API]
+            li.aNav: #[a(class="navbar-brand aNav" href="http://ethereumisrael.org/reddit_plot") Reddit Posts]
             li.aNav: #[a(class="navbar-brand aNav" href="http://ethereumisrael.org/contact-us/") צור קשר]
+            li.aNav: #[a(class="navbar-brand aNav" href="http://ethereumisrael.org/info_explorer") שאלות נפוצות]
             li.aNav: #[a(class="navbar-brand aNav" href="http://ethereumisrael.org/explorer") חיפוש]
-            li.aNav: #[a(class="navbar-brand aNav" href="http://ethereumisrael.org/") לאתר הבית]
+            li.aNav: #[a(class="navbar-brand aNav" href="http://ethereumisrael.org/") Ethereum Israel]
             <!-- add calculators -->
     header
     .container
-      h3(dir="rtl") "מנוע החיפוש" של הבלוקצ'יין
+      h3(dir="rtl") מנוע החיפוש של הבלוקצ'יין &nbsp
+        a(href="http://ethereumisrael.org/") - איתריום ישראל
       .main-content
         block content
       .sidebar

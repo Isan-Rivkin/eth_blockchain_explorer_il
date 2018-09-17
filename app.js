@@ -5,12 +5,25 @@ var fs = require('fs');
 var logger = require('morgan');
 var path = require('path');
 var app = express();
+const url = require('url');
 var Client = require('node-rest-client').Client;
+// google captcha 
+var reCAPTCHA=require('recaptcha2');
+var request = require('request');
+recaptcha=new reCAPTCHA({
+  siteKey:'6LcQdTMUAAAAAH_EdGOdn-FJTM_UPm2tSdDdD8kB',
+  secretKey:'6LcQdTMUAAAAACw5CNit2xMXDQuvU8bunVAi0BuP'
+})
 // etherescan related 
 var api_key = "9EVWVAFQNS1UWXAAMTXSTHY599GYPAD4T1";
 var api = require('etherscan-api').init(api_key);
 var txIDLength = 66;
 var addressLength = 42;
+// ip filtering 
+// var ipfilter = require('express-ipfilter').IpFilter;
+// // Blacklist the following IPs 
+// var ips = [['95.108.128.0','95.108.255.255'],['95.110.0.0','95.110.127.255'],['95.106.0.0','95.107.127.255'],['95.104.128.0','95.105.127.255'],['2.60.0.0','2.63.255.255'],['2.92.0.0','2.95.255.255'],['5.16.0.0','5.19.255.255 ']];
+// app.use(ipfilter(ips));
 /**
   Functions 
 */
@@ -54,6 +67,25 @@ function unixTime(unixtime) {
         ':' + ('0' + u.getUTCSeconds()).slice(-2) +
         '.' + (u.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) 
     };
+  // validate input data
+  var validateInput = function(input){
+    input = input.toString();
+    if(input.substr(0,2).toLowerCase() != "0x" )
+      return false;
+    if(input.length != addressLength && input.length != txIDLength)
+      return false;
+    // contains only alphanumeric - ABC and numbers
+    return input.match('^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]+$');
+  };
+  // write to file
+var saveAnalytic = function(data,path){
+    console.log("saving to: " + path);
+    fs.appendFile(path, data, function (err) {
+  if (err) throw err;
+  console.log('Saved!');
+});
+}
+
  // for extracting data from post forms urls
 var bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({
@@ -66,40 +98,179 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(logger('dev')); //replaces your app.use(express.logger());
 
-
-app.use(express.static('/var/www/ETHBlockchainExplorer/views'))
-app.use(express.static('public'))
-app.use(express.static('views'))
 app.use(express.static(path.join(__dirname, 'views')));
 //app.use('/static', express.static(path.join(__dirname, 'public')));
 
 
+
+var validateCaptcha = function(req,res)
+{
+  if((Object.keys(req.query).length === 0)){
+     handleQuery(req,res);
+  }
+  else
+  {
+    if(req.query['g-recaptcha-response'] === undefined || req.query['g-recaptcha-response'] === '' || req.query['g-recaptcha-response'] === null)
+    {
+      return false;
+    }
+    const secretKey = "6LcQdTMUAAAAACw5CNit2xMXDQuvU8bunVAi0BuP";
+    const verificationURL = "https://www.google.com/recaptcha/api/siteverify?secret=" + secretKey + "&response=" + req.query['g-recaptcha-response'] + "&remoteip=" + req.connection.remoteAddress;
+    request(verificationURL,function(error,response,body) {
+      body = JSON.parse(body);
+      if(body.success !== undefined && !body.success) {
+             var client = new Client();
+        client.get('http://api.fixer.io/latest?base=USD&symbols=ILS',(data,response)=>{            
+              res.render('index',{ title : 'Explorer',data: data, error:"אנא סמנ/י 'I'm not robot"}); 
+        });
+      }
+      handleQuery(req,res);
+    });
+  }  
+}
+
 app.get('/calculators', function (req, res) {
-    user_query = req.query.blockchainquery;
-    console.log("@@@@@@@@@@@@@@@@@@@@@@@");
-    console.log("@@@@:" + user_query);
-    if(Object.keys(req.query).length === 0)
-      console.log("THE QUERT IS UNDEFINED !!!!! ");
-    res.render('calculators',{ title : 'Calculator',content: "Welcome ..." }); 
+   var block = api.proxy.eth_blockNumber();
+   block.then((num)=>{
+    var blockNumber = api.proxy.eth_getBlockByNumber(num.result);
+    blockNumber.then((info)=>{ 
+          var transactions = info.result.transactions.splice(0,10);
+          transactions.forEach((tx)=>{
+            tx.innerGas = hexToDec(tx.gas);
+            tx.innerGasPrice = hexToDec(tx.gasPrice);
+            tx.innerValue = toETH(hexToDec(tx.value));
+          });
+          res.json(info);
+          //res.json({b_num:hexToDec(num.result),remote:transactions});
+    });
+   });
+});
+// app.get('/calculators', function (req, res) {
+//    if((Object.keys(req.query).length === 0)){
+//     res.render('calculators',{});
+//    }
+//    else
+//    {
+//           if(req.query['g-recaptcha-response'] === undefined || req.query['g-recaptcha-response'] === '' || req.query['g-recaptcha-response'] === null)
+//           {
+//             return res.json({"responseError" : "Please select captcha first"});
+//           }
+//           const secretKey = "6LcQdTMUAAAAACw5CNit2xMXDQuvU8bunVAi0BuP";
+//           const verificationURL = "https://www.google.com/recaptcha/api/siteverify?secret=" + secretKey + "&response=" + req.query['g-recaptcha-response'] + "&remoteip=" + req.connection.remoteAddress;
+//           request(verificationURL,function(error,response,body) {
+//             body = JSON.parse(body);
+//             if(body.success !== undefined && !body.success) {
+//               return res.json({"responseError" : "Failed captcha verification"});
+//             }
+//             res.json({"responseSuccess" : "Sucess"});
+//           });
+//    }
+// });
+app.get('/info_explorer', function (req, res) {
+  res.render('info_explorer',{});
 });
 
 
 var handleQuery = function(req,res){
+    
+var ip_addr = req.headers['x-forwarded-for'] || req.connection.remoteAddress.toString();
+if(ip_addr.includes(","))
+{
+	ip_addr = ip_addr.split(",")[0];
+}
+  if (ip_addr == '95.108.181.125' || ip_addr=='95.108.213.8' || ip_addr=='95.108.213.10'
+    || ip_addr=='5.255.253.14' || ip_addr=='87.250.224.95' || ip_addr=='95.108.213.4'
+    || ip_addr=='95.108.213.8' || ip_addr=='37.9.113.117' || ip_addr=='178.154.200.1'
+    || ip_addr=='213.180.203.25' || ip_addr=='5.255.253.10' || ip_addr=='178.154.171.28'
+    || ip_addr=='37.9.113.167' || ip_addr=='41.8.142.96' || ip_addr=='5.45.207.62' 
+    || ip_addr=='37.9.113.117' || ip_addr=='178.154.200.1' || ip_addr =='141.8.183.33'
+    || ip_addr =='95.108.213.8' || ip_addr =='213.180.203.20' || ip_addr=='95.108.181.120'
+    || ip_addr=='95.108.181.125' || ip_addr=='95.108.181.125' || ip_addr=='66.249.70.8'
+    || ip_addr=='141.8.144.101' || ip_addr=='141.8.143.135' || ip_addr=='95.108.213.8' 
+    || ip_addr=='77.88.5.72' || ip_addr=='162.158.92.63' || ip_addr=='141.8.144.101'
+    || ip_addr=='66.249.70.7' || ip_addr=='93.158.161.65' || ip_addr=='84.201.133.73'
+    || ip_addr=='93.158.161.49' || ip_addr=='141.8.144.108' || ip_addr =='84.201.133.54'
+    || ip_addr=='141.8.144.80' || ip_addr=='66.249.70.7' || ip_addr=='77.88.47.67'
+    || ip_addr=='93.158.161.173' || ip_addr=='141.8.144.47' || ip_addr=='93.158.161.44'
+    || ip_addr=='84.201.133.27' || ip_addr=='77.88.5.72' || ip_addr=='5.255.250.149' 
+    || ip_addr=='66.249.79.7' || ip_addr =='66.249.79.9' || ip_addr=='66.249.79.8'
+    || ip_addr=='141.8.144.29')
+  {
+     console.log('@@@ kicked out @@@ ' + ip_addr);
+            // make them wait a bit for a response (optional)
+        setTimeout(function() {
+            res.end();
+        }, 10000);
+  }
+  else
+  {
+    console.log(ip_addr + ' logged in @@@@@@@@@@@@@@@@');
+  } 
+
   //user_query = req.body.blockchainquery;
   if((Object.keys(req.query).length === 0))
   {
      analytics_counter +=1;
-    fs.writeFile("/var/www/ETHBlockchainExplorer/analytics", analytics_counter+'\n', function(err) {
-    if(err) {
-        return console.log(err);
-    }
+    // fs.writeFile("/var/www/ETHBlockchainExplorer/analytics", analytics_counter+'\n', function(err) {
+    // if(err) {
+    //     return console.log(err);
+    // }
     console.log(" + 1 user : counter = " + analytics_counter);
-    }); 
-    res.render('index',{ title : 'ETH',content: "Welcome ..." });
+    //}); 
+    // price widget
+      var client = new Client();
+      client.get('http://api.fixer.io/latest?base=USD&symbols=ILS',(data,response)=>{
+      // ---- links to main page ----- > 
+      var block = api.proxy.eth_blockNumber();
+      block.then((num)=>{
+      var blockNumber = api.proxy.eth_getBlockByNumber(num.result);
+      blockNumber.then((info)=>{ 
+        var transactions = info.result.transactions.splice(0,Math.min(20,info.result.transactions.length));
+        transactions.forEach((tx)=>{
+          tx.innerGas = hexToDec(tx.gas);
+          tx.innerGasPrice = hexToDec(tx.gasPrice);
+          tx.innerValue = toETH(hexToDec(tx.value));
+        });
+        res.render('index',
+          {title:"Explorer",
+          data:data,
+          redirectSearchUrl:"http://ethereumisrael.org/explorer?q=",
+          blockNumber: hexToDec(num.result),
+          numOfTransactions:info.result.transactions.length,
+          tx_data:transactions,
+          blockDifficulty: hexToDec(info.result.totalDifficulty).noExponents(),
+          timeStamp:new Date().toLocaleString()});
+          //timeStamp: unixTime(parseInt(hexToDec(info.timestamp)))});
+      });
+      });
+      // ----- end of links ----- >             
+            //res.render('index',{ title : 'Explorer',data: data}); 
+      });
   }
-  user_query = req.query.q;
+
+  else if(!validateInput(req.query.q.toString().toLowerCase()))
+  {
+          if(req.query.q.toString().length == 64){
+            saveAnalytic(req.query.q.toString() +'\n',"/var/www/ETHBlockchainExplorer//query_analytics");  
+          }
+          //saveAnalytic(ip_addr+'\n',"/var/www/ETHBlockchainExplorer//ip_analytics");
+          //saveAnalytic(req.query.q.toString() +'\n',"/var/www/ETHBlockchainExplorer//query_analytics");
+          var client = new Client();
+      client.get('http://api.fixer.io/latest?base=USD&symbols=ILS',(data,response)=>{            
+            res.render('index',{ title : 'Explorer',data: data}); 
+      });
+  }
+else
+{
+  user_query = req.query.q.toString().toLowerCase();
+         //   saveAnalytic(ip_addr+'\n',"/var/www/ETHBlockchainExplorer//ip_analytics");
+  //saveAnalytic(req.query.q.toString() +'\n',"/var/www/ETHBlockchainExplorer//query_analytics");
+          if(req.query.q.toString().length == 64){
+            saveAnalytic(req.query.q.toString() +'\n',"/var/www/ETHBlockchainExplorer//query_analytics");  
+          }
   if(user_query.length == addressLength)
   {
+    var result_address = user_query;
     // get list of transactions 
     var returned_obj = {full_list:[]};
     var txlist = api.account.txlist(user_query.toString(), 1, 'latest', 'desc');
@@ -133,18 +304,29 @@ var handleQuery = function(req,res){
       balance.then((wei)=>{
         var eth_balance = toETH(wei['result']);
         usd_price.then((usd)=>{
-          client.get('http://api.fixer.io/latest?base=USD&symbols=ILS',(data,response)=>{                   
+          client.get('http://api.fixer.io/latest?base=USD&symbols=ILS',(data,response)=>{  
+                    var try_balance_ils = 0;
+                    try
+                    {
+                      try_just_ils = data.rates.ILS.toString();
+                      try_balance_ils =(data.rates.ILS*usd.result.ethusd*eth_balance).toString();
+                    } 
+                    catch(err)
+                    {
+
+                    }                
                     res.render('account',
-                    {title:"Account", 
+                      {title:"Account", 
+                      redirectSearchUrl : "http://ethereumisrael.org/explorer?q=",
                       results:listTX.result,
                       balance:eth_balance, 
-                      accountNum:user_query.toString(),
-                      balance_ils:(data.rates.ILS*usd.result.ethusd*eth_balance).toString(),
+                      accountNum:result_address,
+                      balance_ils:try_balance_ils,
                       balance_usd:(usd.result.ethusd*eth_balance).toString(),
                       balance_btc:(usd.result.ethbtc*eth_balance).toString(),
                       usdPrice:usd.result.ethusd.toString(),
                       btcPrice:usd.result.ethbtc.toString(),
-                      ilsPrice:data.rates.ILS.toString()});
+                      ilsPrice:try_just_ils});
           });
         });
       });
@@ -179,7 +361,9 @@ var handleQuery = function(req,res){
               info.result.blockNumber = hexToDec(info.result.blockNumber);
               info.result.txStatus = status.status.toString() =="1" ? "הסתיימה": "לא הסתיימה" ;
               info.result.isError = status.result.isError.toString() == "1"? "כן" : "לא"; 
-              res.render('transaction',{title:"TX", result:info.result});
+              res.render('transaction',{title:"TX", 
+                redirectSearchUrl : "http://ethereumisrael.org/explorer?q=",
+                result:info.result});
             }).catch(function(){res.render('index',{ title : 'ETH',error: "קלט לא תקין/כתובת לא קיימת." }); });           
         }).catch(function(){res.render('index',{ title : 'ETH',error: "קלט לא תקין/כתובת לא קיימת." }); });;
       }).catch(function(){res.render('index',{ title : 'ETH',error: "קלט לא תקין/כתובת לא קיימת." }); });;
@@ -189,7 +373,9 @@ var handleQuery = function(req,res){
   {
     res.render('index',{ title : 'ETH',error: "קלט לא תקין" }); 
   }
+}
 };
 app.get('/',handleQuery);
+//app.get('/',validateCaptcha);
 app.post('/',handleQuery);
 app.listen(7000);

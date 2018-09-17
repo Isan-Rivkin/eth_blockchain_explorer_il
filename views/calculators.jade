@@ -1,7 +1,19 @@
 extend layout
 block content
-	h1 Ether Calculators - under construction
-	p #{content}
-	form(action="/calculators", method = "get")
-		input(type="text" id="search" class="form-control" ,name="q",placeholder="Txhash/Address/מס חשבון/טרנזקציה" required)
-		button.btn.btn-large.btn-primary(type="submit" class="btn btn-primary btn-block") חפש/י ש/י 
+	script(src='explorer_libs/scripts/clientUtils.js')
+	link(rel='stylesheet', href='/explorer_libs/stylesheets/index.css')
+	h1 Ether Calculators - under construction- OTHER GO
+	div(class='panel-group w3-mobile')
+		- var i = 0
+		each tx in tx_data
+			-i = i+1
+			div(class ='panel panel-info')
+				div(class ='panel-heading' dir='rtl')
+					label סכום:  #{tx.innerValue} אית'ר 
+					button(type="button" class="btn btn-info" style="margin-left:5px;margin-right:5px;" data-toggle="collapse" data-target="#hash#{i}") מספר טרנזקציה
+					a(id ="hash#{i}" href ="#{redirectSearchUrl}#{tx.hash}" class="collapse") #{tx.hash}			
+					button(type="button" class="btn btn-info" style="margin-left:5px;" data-toggle="collapse" data-target="#from#{i}") שולח
+					a(id ="from#{i}" href ="#{redirectSearchUrl}#{tx.from}" class="collapse") #{tx.from}
+					button(type="button" class="btn btn-info" style="margin-left:5px;" data-toggle="collapse" data-target="#to#{i}") המקבל
+					a(id ="to#{i}" href ="#{redirectSearchUrl}#{tx.to}" class="collapse") #{tx.to}
+
